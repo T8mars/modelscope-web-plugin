@@ -3,6 +3,7 @@
 
 import os
 import logging
+import sys
 from flask import Flask, send_from_directory, request, make_response
 from flask_cors import CORS
 from config import (
@@ -24,9 +25,30 @@ from routes import main_bp
 
 from task_poller import task_poller_bp
 
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
+
+
+def backend_port():
+    try:
+        return int(os.getenv('T8_BACKEND_PORT') or os.getenv('PORT') or '5000')
+    except (TypeError, ValueError):
+        return 5000
+
+
 def create_app():
     """创建并配置Flask应用"""
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=resource_path('templates'),
+        static_folder=resource_path('static'),
+        static_url_path='/static',
+    )
     CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
     app.secret_key = 'a_very_secret_key'  # 使用一个固定的密钥
 
@@ -73,4 +95,4 @@ def create_app():
 if __name__ == '__main__':
 
     app = create_app()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=backend_port(), debug=False)

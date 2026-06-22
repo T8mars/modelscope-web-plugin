@@ -21,6 +21,7 @@
 - 支持自定义 LoRA，并按当前生图模型绑定。
 - 支持反推提示词展示与复制。
 - Windows 启动器会检测旧服务版本，避免 `/api/runtime_settings` 缺失导致右键同步失败。
+- 支持 Electron Windows 便携版打包，双击后自动启动内置 Flask 后端。
 
 ## 目录结构
 
@@ -35,7 +36,10 @@
 ├── templates/index.html       # Web 页面
 ├── static/                    # Web CSS/JS
 ├── extension/                 # Chrome/Edge 扩展源码
+├── electron/main.js           # Electron 主进程
+├── packaging/                 # PyInstaller 和桌面版打包脚本
 ├── tests/                     # 单元和契约测试
+├── package.json               # Electron/electron-builder 配置
 ├── requirements.txt
 └── 启动器.bat                 # Windows 本地启动器
 ```
@@ -109,6 +113,49 @@ Web 页面保存配置后，会同步到本地 Flask 运行时配置。右键扩
 7. 在任意网页图片上右键，选择 `反推生图 图片`。
 
 如果扩展仍显示旧名称或旧行为，请在扩展管理页点击“重新加载”。
+
+## 打包 Windows 桌面版
+
+桌面版会把 Flask 后端打成 `t8-backend.exe`，再通过 Electron 启动本地 Web 页面。用户运行便携版时不需要自己安装 Python 或 Node。
+
+构建依赖：
+
+```powershell
+npm install
+```
+
+生成便携版：
+
+```powershell
+npm run dist:win
+```
+
+产物位置：
+
+```text
+release/T8 ModelScope Web Plugin-1.0.0-x64.exe
+```
+
+调试用目录包：
+
+```powershell
+npm run pack:win
+```
+
+生成安装器：
+
+```powershell
+npm run dist:win:installer
+```
+
+打包脚本会自动创建 `.venv-build/`，安装 `requirements.txt`，并用 `packaging/t8-backend.spec` 把 `templates/`、`static/` 和后端源码打进 `dist/t8-backend.exe`。Electron 启动后会等待 `/health` 和 `/api/runtime_settings` 可访问，再加载页面。
+
+可选环境变量：
+
+| 变量 | 用途 |
+| --- | --- |
+| `T8_BACKEND_PORT` | 覆盖 Electron 内置后端端口，默认 `5000` |
+| `T8_UPLOAD_FOLDER` | 覆盖后端上传目录；桌面版默认使用 Electron 用户数据目录 |
 
 ## API 配置
 
@@ -186,7 +233,7 @@ Compress-Archive -Path .\extension\* -DestinationPath .\dist\qwen-web-chrome-ext
 - 不要把真实 API Key 写入代码、README、测试或提交历史。
 - Web 页面中的 Token 保存在浏览器本地，并同步到当前 Flask 进程内存。
 - `/api/runtime_settings` 不返回 Token 明文。
-- `uploads/`、`dist/`、本地日志、缓存和本地上下文文件不会进入 Git。
+- `uploads/`、`dist/`、`release/`、本地日志、缓存、打包 venv 和本地上下文文件不会进入 Git。
 
 ## 常见问题
 

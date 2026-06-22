@@ -11,8 +11,8 @@ def _env_int(name, default):
     except (TypeError, ValueError):
         return default
 
-# 配置上传文件夹和允许的文件扩展名
-UPLOAD_FOLDER = os.path.join(here, 'uploads')
+# 配置上传文件夹和允许的文件扩展名。Electron 打包后通过 T8_UPLOAD_FOLDER 指向用户可写目录。
+UPLOAD_FOLDER = _env("T8_UPLOAD_FOLDER") or _env("UPLOAD_FOLDER") or os.path.join(here, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB上传限制
 

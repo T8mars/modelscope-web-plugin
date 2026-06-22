@@ -13,11 +13,20 @@ roadmap.md
 # Runtime data
 uploads/
 dist/
+release/
+build/
 
 # Python cache and local test output
 __pycache__/
 *.py[cod]
 .pytest_cache/
+*.log
+.venv*/
+
+# Node/Electron dependencies and caches
+node_modules/
+.electron-gyp/
+*.blockmap
 
 # Editor and OS files
 .DS_Store

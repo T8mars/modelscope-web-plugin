@@ -1,0 +1,54 @@
+{
+  "name": "t8-modelscope-web-plugin",
+  "version": "1.0.0",
+  "description": "T8 local image reverse prompt and ModelScope image generation desktop package.",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "electron:dev": "electron .",
+    "backend:build": "powershell -NoProfile -ExecutionPolicy Bypass -File packaging/build-backend.ps1 packaging/t8-backend.spec",
+    "pack:win": "npm run backend:build && electron-builder --win dir",
+    "dist:win": "npm run backend:build && electron-builder --win portable",
+    "dist:win:installer": "npm run backend:build && electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "42.4.1",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.t8.modelscope.webplugin",
+    "productName": "T8 ModelScope Web Plugin",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/t8-backend.exe",
+        "to": "backend/t8-backend.exe"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
