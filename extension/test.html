@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插件测试页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        .section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success { background-color: #d4edda; color: #155724; }
+        .status.error { background-color: #f8d7da; color: #721c24; }
+        .status.warning { background-color: #fff3cd; color: #856404; }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover { background-color: #0056b3; }
+        .btn:disabled { background-color: #6c757d; cursor: not-allowed; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .test-image {
+            max-width: 200px;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 T8 图片反推+ModelScope 生图 插件测试</h1>
+
+        <!-- 插件状态检查 -->
+        <div class="section">
+            <h2>1. 插件状态检查</h2>
+            <div id="extensionStatus" class="status warning">检查中...</div>
+            <button class="btn" onclick="checkExtension()">重新检查插件</button>
+        </div>
+
+        <!-- 后端服务检查 -->
+        <div class="section">
+            <h2>2. 后端服务检查</h2>
+            <div id="serverStatus" class="status warning">检查中...</div>
+            <button class="btn" onclick="checkServer()">检查服务器连接</button>
+            <div style="margin-top: 10px;">
+                <small>后端服务地址: <code>http://localhost:5000</code></small>
+            </div>
+        </div>
+
+        <!-- 测试图片 -->
+        <div class="section">
+            <h2>3. 测试图片</h2>
+            <p>可以使用以下测试图片来验证插件功能：</p>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div>
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTllY2VmIi8+PHBvbHlnb24gcG9pbnRzPSI1MCwxMjAgODAsMTIwIDEwMCw4MCA2MCw0MCA0MCw2MCAyMCw4MCIgZmlsbD0iIzZjNzU3ZCIvPjxjaXJjbGUgY3g9IjE2MCIgY3k9IjMwIiByPSIxNSIgZmlsbD0iI2ZmYzEwNyIvPjx0ZXh0IHg9IjEwMCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0OTUwNTciPuWxseWzsOmjjuaZrzwvdGV4dD48L3N2Zz4="
+                         class="test-image" alt="山峰风景">
+                    <p><small>测试图片1: 山峰风景</small></p>
+                </div>
+                <div>
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iNzUiIHI9IjQwIiBmaWxsPSIjMDA3YmZmIiBvcGFjaXR5PSIwLjciLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIyNSIgZmlsbD0iIzI4YTc0NSIgb3BhY2l0eT0iMC44Ii8+PGNpcmNsZSBjeD0iMTQwIiBjeT0iNTAiIHI9IjIwIiBmaWxsPSIjZGMzNTQ1IiBvcGFjaXR5PSIwLjciLz48dGV4dCB4PSIxMDAiIHk9IjE0MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNDk1MDU3Ij7lnZDkvZPlm77moYg8L3RleHQ+PC9zdmc+"
+                         class="test-image" alt="抽象图形">
+                    <p><small>测试图片2: 抽象图形</small></p>
+                </div>
+            </div>
+            <p><small>💡 提示: 右键保存图片，然后在插件中上传测试</small></p>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="section">
+            <h2>4. 使用说明</h2>
+            <ol>
+                <li><strong>安装插件</strong>: 在Chrome中加载 <code>extension</code> 文件夹</li>
+                <li><strong>启动后端</strong>: 运行 <code>python web_app.py</code></li>
+                <li><strong>配置设置</strong>: 在 Web 页面保存反推 Token、ModelScope API Token 和模型参数</li>
+                <li><strong>测试功能</strong>: 上传图片并点击"反推并生成"</li>
+            </ol>
+        </div>
+
+        <!-- 调试信息 -->
+        <div class="section">
+            <h2>5. 调试信息</h2>
+            <button class="btn" onclick="showDebugInfo()">显示调试信息</button>
+            <button class="btn" onclick="clearDebugInfo()">清除信息</button>
+            <pre id="debugInfo">点击"显示调试信息"查看详细信息...</pre>
+        </div>
+    </div>
+
+    <script>
+        // 检查插件是否已安装
+        function checkExtension() {
+            const statusDiv = document.getElementById('extensionStatus');
+
+            // 检查是否在Chrome扩展环境中
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ 插件环境检测成功 - 扩展ID: ' + chrome.runtime.id;
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ 未检测到Chrome扩展环境，请确保已正确安装插件';
+            }
+        }
+
+        // 检查后端服务
+        async function checkServer() {
+            const statusDiv = document.getElementById('serverStatus');
+            statusDiv.className = 'status warning';
+            statusDiv.textContent = '🔄 正在检查服务器连接...';
+
+            try {
+                const response = await fetch('http://localhost:5000/health', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ 后端服务连接正常 - ' + (data.message || '服务运行中');
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ 后端服务响应异常 - HTTP ' + response.status;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ 无法连接到后端服务 - ' + error.message;
+            }
+        }
+
+        // 显示调试信息
+        function showDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            const info = {
+                timestamp: new Date().toLocaleString(),
+                userAgent: navigator.userAgent,
+                location: window.location.href,
+                chromeExtension: typeof chrome !== 'undefined' && chrome.runtime ? {
+                    id: chrome.runtime.id || 'N/A',
+                    version: chrome.runtime.getManifest ? chrome.runtime.getManifest().version : 'N/A'
+                } : 'Not available',
+                localStorage: {
+                    available: typeof localStorage !== 'undefined',
+                    items: localStorage ? Object.keys(localStorage).length : 0
+                },
+                permissions: {
+                    storage: typeof chrome !== 'undefined' && chrome.storage ? 'Available' : 'Not available',
+                    activeTab: 'Unknown'
+                }
+            };
+
+            debugInfo.textContent = JSON.stringify(info, null, 2);
+        }
+
+        // 清除调试信息
+        function clearDebugInfo() {
+            document.getElementById('debugInfo').textContent = '点击"显示调试信息"查看详细信息...';
+        }
+
+        // 页面加载时自动检查
+        window.addEventListener('load', () => {
+            checkExtension();
+            checkServer();
+        });
+
+        // 定期检查服务器状态
+        setInterval(checkServer, 30000); // 每30秒检查一次
+    </script>
+</body>
+</html>

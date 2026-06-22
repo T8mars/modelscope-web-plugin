@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T8 图片反推+ModelScope 生图</title>
+    <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🎨 T8 图片反推+ModelScope 生图</h1>
+            <button id="settingsBtn" class="settings-btn" title="设置">⚙️</button>
+        </div>
+        <div id="serverStatus" class="server-status">本地服务检测中...</div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 图片上传区域 -->
+            <div class="upload-section">
+                <div id="fileDropArea" class="file-drop-area">
+                    <input type="file" id="fileInput" class="file-input" accept=".png,.jpg,.jpeg,.gif,.bmp" />
+
+                    <!-- 拖放提示 -->
+                    <div id="dropPlaceholder" class="drop-placeholder">
+                        <div class="feature-icon">📁</div>
+                        <p>拖放图片到此处，或点击上传</p>
+                        <p class="text-muted">(支持 PNG、JPG、JPEG、GIF、BMP)</p>
+                    </div>
+
+                    <!-- 图片预览 -->
+                    <div id="imagePreview" class="image-preview" style="display: none;">
+                        <img id="previewImg" src="" alt="预览图片">
+                    </div>
+                </div>
+
+                <!-- 上传进度 -->
+                <div id="uploadProgress" class="upload-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <span id="progressText">上传中...</span>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons">
+                    <button id="analyzeBtn" class="btn btn-primary" disabled>反推并生成</button>
+                </div>
+            </div>
+
+            <!-- 生成结果区域 -->
+            <div class="result-section">
+                <!-- 排队信息 -->
+                <div id="queueInfo" class="queue-info" style="display: none;">
+                    <h3>正在处理中</h3>
+                    <p id="queueDetail">正在获取排队信息...</p>
+                    <div class="progress-bar">
+                        <div id="queueProgress" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- 主预览区域 -->
+                <div id="mainPreview" class="main-preview">
+                    <div class="preview-placeholder">
+                        选择下方缩略图查看
+                    </div>
+                </div>
+
+                <!-- 缩略图区域 -->
+                <div id="thumbnailsContainer" class="thumbnails-container">
+                    <!-- 缩略图将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- 设置面板 -->
+        <div id="settingsPanel" class="settings-panel" style="display: none;">
+            <div class="settings-header">
+                <h3>设置</h3>
+                <button id="closeSettings" class="close-btn">×</button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <label for="openaiKey">反推 Token（可选）:</label>
+                    <input type="password" id="openaiKey" placeholder="不填则复用 ModelScope API Token">
+                </div>
+                <div class="setting-item">
+                    <label for="modelscopeApiKey">ModelScope API Token:</label>
+                    <textarea id="modelscopeApiKey" placeholder="输入你的ModelScope API Token" rows="4"></textarea>
+                </div>
+                <div class="setting-item">
+                    <label for="generationModel">生图模型:</label>
+                    <select id="generationModel"></select>
+                </div>
+                <div class="setting-item">
+                    <label for="imageWidth">图片宽度:</label>
+                    <input type="number" id="imageWidth" value="1104" min="256" max="2048">
+                </div>
+                <div class="setting-item">
+                    <label for="imageHeight">图片高度:</label>
+                    <input type="number" id="imageHeight" value="1472" min="256" max="2048">
+                </div>
+                <div class="setting-item">
+                    <label for="numImages">生成张数:</label>
+                    <input type="number" id="numImages" value="1" min="1" max="4">
+                </div>
+                <div class="setting-item">
+                    <label>LoRA:</label>
+                    <div id="loraOptions" class="lora-options">
+                        <div class="setting-hint">连接本地服务后加载</div>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="customLoraId">自定义 LoRA（绑定当前模型）:</label>
+                    <div class="custom-lora-editor">
+                        <input type="text" id="customLoraId" placeholder="owner/model-name">
+                        <input type="number" id="customLoraStrength" min="0" max="1" step="0.05" value="0.8" title="原始权重，多 LoRA 会归一到 1.00">
+                        <button type="button" id="addCustomLora" class="inline-btn">添加</button>
+                    </div>
+                    <div id="customLoraList" class="custom-lora-list"></div>
+                </div>
+                <div class="lora-weight-panel">
+                    <span id="loraWeightSummary">未选择 LoRA</span>
+                    <button type="button" id="balanceLoras" class="inline-btn" disabled>均分到 1.00</button>
+                </div>
+                <div class="settings-actions">
+                    <button id="saveSettings" class="btn btn-primary">保存设置</button>
+                    <button id="resetSettings" class="btn btn-secondary">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast 通知容器 -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/api.js"></script>
+    <script src="scripts/popup.js"></script>
+</body>
+</html>

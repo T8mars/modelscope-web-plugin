@@ -1,0 +1,29 @@
+# Local agent/project context
+SKILL.md
+features.json
+meta.json
+roadmap.md
+
+# Secrets and local configuration
+.env
+.env.*
+*.key
+*.pem
+
+# Runtime data
+uploads/
+dist/
+
+# Python cache and local test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local assistant/tooling state
+.codebuddy/

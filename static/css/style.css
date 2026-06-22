@@ -1,0 +1,271 @@
+/* static/css/style.css */
+body {
+    background-color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+
+.card-title {
+    margin-bottom: 0;
+    font-size: 1.25rem;
+}
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #263238;
+}
+
+.file-drop-area {
+    border: 2px dashed #007bff;
+    border-radius: 0.75rem;
+    color: #007bff;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    cursor: pointer;
+    position: relative;
+}
+
+.file-drop-area:hover {
+    background-color: #e9f2ff;
+    border-color: #0056b3;
+}
+
+.file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    top: -9999px;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.feature-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.generation-settings {
+    border: 1px solid #dce3ea;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 12px;
+}
+
+.generation-settings .form-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+.api-key-settings {
+    border-bottom: 1px solid #e4e9ef;
+    padding-bottom: 10px;
+}
+
+.api-key-settings .btn {
+    padding: 0.42rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.lora-options {
+    display: grid;
+    gap: 6px;
+    max-height: 118px;
+    overflow-y: auto;
+}
+
+.lora-option {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    min-height: 38px;
+    padding: 7px 8px;
+    border: 1px solid #e3e8ee;
+    border-radius: 6px;
+    background: #fbfcfd;
+    cursor: pointer;
+}
+
+.lora-option:hover {
+    border-color: #8bb7e8;
+}
+
+.lora-option input {
+    margin-top: 2px;
+}
+
+.lora-copy {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.lora-option strong {
+    display: block;
+    font-size: 0.82rem;
+    line-height: 1.1;
+}
+
+.lora-option small {
+    display: block;
+    color: #6c757d;
+    font-size: 0.72rem;
+    word-break: break-all;
+}
+
+.lora-strength-input {
+    width: 74px;
+    flex: 0 0 74px;
+    padding: 0.2rem 0.35rem;
+    font-size: 0.75rem;
+}
+
+.custom-lora-editor {
+    border-top: 1px solid #e4e9ef;
+    padding-top: 9px;
+}
+
+.custom-lora-list {
+    display: grid;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.custom-lora-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 34px;
+    padding: 6px 8px;
+    border: 1px solid #e3e8ee;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+.custom-lora-item span {
+    min-width: 0;
+    flex: 1 1 auto;
+    font-size: 0.78rem;
+    word-break: break-all;
+}
+
+.custom-lora-item input {
+    width: 74px;
+    flex: 0 0 74px;
+    padding: 0.2rem 0.35rem;
+    font-size: 0.75rem;
+}
+
+.custom-lora-item button {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.45rem;
+}
+
+.custom-lora-empty {
+    color: #6c757d;
+    font-size: 0.76rem;
+}
+
+.lora-weight-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 38px;
+    padding: 7px 8px;
+    border: 1px solid #f0d98a;
+    border-radius: 6px;
+    background: #fffaf0;
+}
+
+.lora-weight-summary {
+    min-width: 0;
+    color: #6b4d00;
+    font-size: 0.76rem;
+    line-height: 1.35;
+}
+
+.lora-weight-panel button {
+    flex: 0 0 auto;
+    padding: 0.25rem 0.55rem;
+}
+
+.prompt-result-panel {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #dce3ea;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.prompt-result-panel textarea {
+    font-size: 0.86rem;
+    line-height: 1.55;
+    background: #fbfcfd;
+}
+
+#image_preview img {
+    border-radius: 0.5rem;
+}
+
+
+
+#main_preview_area {
+    background-color: #e9ecef;
+    border-radius: 0.5rem;
+}
+
+#thumbnails_container img {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+#thumbnails_container img.selected,
+#thumbnails_container img:hover {
+    border-color: #007bff;
+}
+
+.modal-content {
+    border-radius: 0.75rem;
+}
+
+/* Override some bootstrap defaults for a more modern look */
+.btn {
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+}
+
+.form-control {
+    border-radius: 0.5rem;
+}
+
+textarea.form-control {
+    resize: none;
+}

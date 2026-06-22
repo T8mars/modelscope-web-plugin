@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T8 图片反推+ModelScope 生图</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 主内容区域：图片反推和生成 -->
+        <div class="row mb-4">
+            <!-- 左侧：图片上传和提示词输入 -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">图片上传</h3>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <!-- 文件拖放区域 -->
+                        <div id="file_drop_area" class="file-drop-area mb-3 flex-grow-1" style="height: 400px; min-height: 400px; max-height: 400px; position: relative;">
+                            <input type="file" id="file_input" class="file-input" accept=".png,.jpg,.jpeg,.gif,.bmp" />
+
+                            <!-- 拖放提示 -->
+                            <div id="drop_placeholder" class="d-flex flex-column justify-content-center align-items-center h-full">
+                                <div class="feature-icon">📁</div>
+                                <p>拖放图片到此处，或点击此处上传图片</p>
+                                <p class="text-muted mt-2">(支持 PNG、JPG、JPEG、GIF、BMP 格式)</p>
+                            </div>
+
+                            <!-- 图片预览区域 -->
+                            <div id="image_preview" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent;">
+                                <img id="preview_img" src="" alt="预览图片" style="max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            </div>
+                            <!-- URL图片预览区域 -->
+                            <div id="url_image_preview" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent;">
+                                <img id="url_preview_img" src="" alt="URL预览图片" style="max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            </div>
+
+                            <!-- 上传成功信息 -->
+                            <div id="uploaded_file_info" style="display: none; position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; background-color: rgba(255, 255, 255, 0.8); padding: 5px;">
+                                <p id="file_name" class="mb-0">已上传：</p>
+                            </div>
+                        </div>
+
+                        <!-- 上传进度条 -->
+                        <div id="upload_progress_container" style="display: none;">
+                            <div class="progress">
+                                <div id="upload_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- 生图参数 -->
+                        <div class="generation-settings my-3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h4 class="section-title mb-0">生成设置</h4>
+                                <span id="options_status" class="text-muted small">加载配置中...</span>
+                            </div>
+                            <div class="api-key-settings mb-3">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label for="modelscope_api_key" class="form-label mb-0">ModelScope API Token</label>
+                                    <span id="api_key_status" class="text-muted small">未设置</span>
+                                </div>
+                                <input type="password" id="modelscope_api_key" class="form-control form-control-sm mb-2" autocomplete="off" placeholder="ms-...">
+                                <label for="analysis_api_key" class="form-label">反推 Token（可选）</label>
+                                <input type="password" id="analysis_api_key" class="form-control form-control-sm mb-2" autocomplete="off" placeholder="不填则复用 ModelScope Token">
+                                <div class="d-flex gap-2">
+                                    <button type="button" id="save_api_keys" class="btn btn-outline-primary btn-sm flex-fill">保存</button>
+                                    <button type="button" id="clear_api_keys" class="btn btn-outline-secondary btn-sm flex-fill">清空</button>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="generation_model" class="form-label">模型</label>
+                                <select id="generation_model" class="form-select form-select-sm"></select>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-4">
+                                    <label for="image_width" class="form-label">宽</label>
+                                    <input type="number" id="image_width" class="form-control form-control-sm" min="64" max="4096" step="8" value="1104">
+                                </div>
+                                <div class="col-4">
+                                    <label for="image_height" class="form-label">高</label>
+                                    <input type="number" id="image_height" class="form-control form-control-sm" min="64" max="4096" step="8" value="1472">
+                                </div>
+                                <div class="col-4">
+                                    <label for="num_images" class="form-label">张数</label>
+                                    <input type="number" id="num_images" class="form-control form-control-sm" min="1" max="4" value="1">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">LoRA</label>
+                                <div id="lora_options" class="lora-options"></div>
+                            </div>
+                            <div class="custom-lora-editor mt-2">
+                                <label for="custom_lora_id" class="form-label">自定义 LoRA（绑定当前模型）</label>
+                                <div class="row g-2">
+                                    <div class="col-7">
+                                        <input type="text" id="custom_lora_id" class="form-control form-control-sm" placeholder="owner/model-name">
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="number" id="custom_lora_strength" class="form-control form-control-sm" min="0" max="1" step="0.05" value="0.8">
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" id="add_custom_lora" class="btn btn-outline-primary btn-sm w-100">添加</button>
+                                    </div>
+                                </div>
+                                <div id="custom_lora_list" class="custom-lora-list"></div>
+                            </div>
+                            <div class="lora-weight-panel mt-2">
+                                <div id="lora_weight_summary" class="lora-weight-summary">未选择 LoRA</div>
+                                <button type="button" id="balance_loras" class="btn btn-outline-secondary btn-sm" disabled>均分到 1.00</button>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="d-flex gap-2">
+                            <button id="analyze_and_generate" class="btn btn-success w-100" disabled>反推并生成</button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- 右侧：分析结果和图像生成结果 -->
+            <div class="col-md-6">
+
+
+                <!-- 图像生成结果 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">生成预览</h3>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <!-- 反推提示词 -->
+                        <div id="prompt_result_panel" class="prompt-result-panel d-none">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label for="reverse_prompt" class="section-title mb-0">反推提示词</label>
+                                <button type="button" id="copy_reverse_prompt" class="btn btn-outline-primary btn-sm">复制</button>
+                            </div>
+                            <textarea id="reverse_prompt" class="form-control" readonly rows="5"></textarea>
+                        </div>
+
+                        <!-- 排队信息显示区域 -->
+                        <div id="queue_info" class="mb-3 p-3 bg-info text-white rounded d-none">
+                            <h5 class="mb-1">正在处理中</h5>
+                            <p id="queue_detail" class="mb-2">正在获取排队信息...</p>
+                            <!-- 进度条 -->
+                            <div class="progress" style="height: 20px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.3);">
+                                <div id="progress_bar" class="progress-bar bg-white" role="progressbar" style="width: 0%; border-radius: 10px; display: none;"></div>
+                            </div>
+                        </div>
+
+                        <!-- 主预览区域 -->
+                        <div id="main_preview_area" class="flex-grow-1" style="background-color: #f8f9fa; border-radius: 4px; padding: 10px; height: 400px; min-height: 400px; max-height: 400px; display: flex; justify-content: center; align-items: center;">
+                            <div class="d-flex justify-content-center align-items-center text-muted">
+                                选择下方缩略图查看
+                            </div>
+                        </div>
+
+                        <!-- 缩略图选择区域 -->
+                        <div id="thumbnails_container" class="mt-3" style="display: flex; gap: 10px; justify-content: center; overflow-x: auto;">
+                            <!-- 缩略图将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast_container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- 关于模态框 -->
+    <div class="modal fade" id="about_modal" tabindex="-1" aria-labelledby="about_modal_label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="about_modal_label">关于 T8 图片反推+ModelScope 生图</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>T8 图片反推+ModelScope 生图是一款基于视觉模型的图片内容分析与 ModelScope 图片生成工具。</p>
+                    <p class="mt-2"><strong>功能特点：</strong></p>
+                    <ul>
+                        <li>支持拖放上传图片</li>
+                        <li>自动分析图片内容并生成详细描述</li>
+                        <li>可保存和管理 API Key</li>
+                        <li>提供操作日志记录</li>
+                    </ul>
+                    <p class="mt-2 text-muted">注意：使用前请确保您已获得有效的 API Key。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
