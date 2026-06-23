@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "T8 图片反推+ModelScope 生图",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "基于视觉模型的图片内容分析与 ModelScope 图片生成工具",
   "permissions": [
     "storage",

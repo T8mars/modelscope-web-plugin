@@ -133,7 +133,7 @@ npm run dist:win
 产物位置：
 
 ```text
-release/T8 ModelScope Web Plugin-1.0.0-x64.exe
+release/T8 ModelScope Web Plugin-1.0.1-x64.exe
 ```
 
 调试用目录包：
@@ -225,7 +225,7 @@ node --check extension\scripts\content.js
 
 ```powershell
 New-Item -ItemType Directory -Force dist | Out-Null
-Compress-Archive -Path .\extension\* -DestinationPath .\dist\qwen-web-chrome-extension.zip -Force
+Compress-Archive -Path .\extension\* -DestinationPath .\dist\T8-Chrome-Extension-v1.0.1.zip -Force
 ```
 
 ## 安全说明
