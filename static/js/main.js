@@ -1,6 +1,8 @@
 // static/js/main.js
 
 document.addEventListener('DOMContentLoaded', function() {
+    document.title = 'T8 图片反推+ModelScope 生图';
+
     const MAX_LORAS_PER_REQUEST = 5;
     const LORA_TOTAL_WEIGHT = 1;
     const LORA_WEIGHT_DECIMALS = 4;

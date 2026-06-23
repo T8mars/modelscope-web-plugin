@@ -25,6 +25,14 @@ class FrontendContractTests(unittest.TestCase):
         self.assertIn("loadModelscopeOptions", main_js)
         self.assertIn("getGenerationOptions", main_js)
 
+    def test_web_page_branding_uses_t8_not_gua(self):
+        html = read_text("templates", "index.html")
+        main_js = read_text("static", "js", "main.js")
+
+        self.assertIn("<title>T8 图片反推+ModelScope 生图</title>", html)
+        self.assertIn("document.title = 'T8 图片反推+ModelScope 生图';", main_js)
+        self.assertNotIn("Gua", html + main_js)
+
     def test_web_page_exposes_and_uses_api_key_settings(self):
         html = read_text("templates", "index.html")
         api_js = read_text("static", "js", "api.js")
